@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Saffron Script — Luxury Menu Atelier</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Raleway:wght@200;300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #F7F3EC;
+    --parchment: #EDE8DF;
+    --gold: #C9A84C;
+    --gold-light: #E8D08A;
+    --gold-pale: #F5EDCC;
+    --charcoal: #1E1E1E;
+    --warm-gray: #6B6460;
+    --deep-brown: #2C1A0E;
+    --burgundy: #6B2737;
+    --sage: #7A9E7E;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Raleway', sans-serif;
+    background-color: var(--cream);
+    background-image: 
+      radial-gradient(ellipse at 0% 0%, rgba(201,168,76,0.08) 0%, transparent 60%),
+      radial-gradient(ellipse at 100% 100%, rgba(107,39,55,0.05) 0%, transparent 60%);
+    min-height: 100vh;
+    color: var(--charcoal);
+  }
+
+  /* Grain overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.4;
+  }
+
+  .page-wrapper {
+    position: relative;
+    z-index: 1;
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 60px 30px 80px;
+  }
+
+  /* Header */
+  .header {
+    text-align: center;
+    margin-bottom: 60px;
+    animation: fadeDown 0.8s ease both;
+  }
+
+  .header-ornament {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+
+  .ornament-line {
+    height: 1px;
+    width: 80px;
+    background: linear-gradient(to right, transparent, var(--gold));
+  }
+  .ornament-line.right {
+    background: linear-gradient(to left, transparent, var(--gold));
+  }
+
+  .ornament-diamond {
+    width: 8px;
+    height: 8px;
+    background: var(--gold);
+    transform: rotate(45deg);
+  }
+
+  h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 300;
+    font-size: clamp(42px, 6vw, 64px);
+    letter-spacing: 0.12em;
+    color: var(--deep-brown);
+    line-height: 1;
+  }
+
+  h1 span {
+    color: var(--gold);
+  }
+
+  .tagline {
+    font-family: 'Raleway', sans-serif;
+    font-weight: 200;
+    font-size: 13px;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: var(--warm-gray);
+    margin-top: 12px;
+  }
+
+  /* Card */
+  .card {
+    background: white;
+    border-radius: 2px;
+    padding: 50px 50px;
+    box-shadow: 
+      0 2px 4px rgba(0,0,0,0.04),
+      0 20px 60px rgba(44,26,14,0.08),
+      inset 0 0 0 1px rgba(201,168,76,0.15);
+    animation: fadeUp 0.9s 0.2s ease both;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(to right, var(--burgundy), var(--gold), var(--burgundy));
+  }
+
+  /* Section labels */
+  .section-label {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 8px;
+    display: block;
+  }
+
+  .field-group {
+    margin-bottom: 28px;
+  }
+
+  /* Inputs */
+  input[type="text"], select, textarea {
+    width: 100%;
+    padding: 14px 16px;
+    background: var(--cream);
+    border: 1px solid rgba(201,168,76,0.25);
+    border-radius: 2px;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18px;
+    font-weight: 400;
+    color: var(--charcoal);
+    outline: none;
+    transition: border-color 0.3s, box-shadow 0.3s;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+
+  input::placeholder, textarea::placeholder {
+    color: #B5AFA8;
+    font-style: italic;
+  }
+
+  input:focus, select:focus, textarea:focus {
+    border-color: var(--gold);
+    box-shadow: 0 0 0 3px rgba(201,168,76,0.08);
+    background: white;
+  }
+
+  textarea {
+    min-height: 90px;
+    resize: vertical;
+    line-height: 1.6;
+  }
+
+  /* Select wrapper with custom arrow */
+  .select-wrapper {
+    position: relative;
+  }
+  .select-wrapper::after {
+    content: '◆';
+    font-size: 7px;
+    color: var(--gold);
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+  }
+
+  select {
+    cursor: pointer;
+    padding-right: 36px;
+  }
+
+  /* Two column grid */
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  /* Checkbox group */
+  .check-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 4px;
+  }
+
+  .check-pill {
+    position: relative;
+  }
+
+  .check-pill input[type="checkbox"] {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+
+  .check-pill label {
+    display: inline-block;
+    padding: 7px 16px;
+    border: 1px solid rgba(201,168,76,0.3);
+    border-radius: 2px;
+    font-size: 12px;
+    font-weight: 400;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--warm-gray);
+    cursor: pointer;
+    transition: all 0.2s;
+    background: var(--cream);
+    user-select: none;
+  }
+
+  .check-pill input:checked + label {
+    background: var(--gold);
+    border-color: var(--gold);
+    color: white;
+  }
+
+  .check-pill label:hover {
+    border-color: var(--gold);
+    color: var(--deep-brown);
+  }
+
+  /* Divider */
+  .divider {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin: 32px 0;
+  }
+  .divider-line { flex: 1; height: 1px; background: rgba(201,168,76,0.2); }
+  .divider-text { font-size: 10px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--gold); }
+
+  /* Generate button */
+  .btn-generate {
+    width: 100%;
+    padding: 18px;
+    background: var(--deep-brown);
+    border: none;
+    border-radius: 2px;
+    color: var(--gold-light);
+    font-family: 'Raleway', sans-serif;
+    font-size: 12px;
+    font-weight: 400;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+    margin-top: 10px;
+  }
+
+  .btn-generate::before {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%;
+    width: 100%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(201,168,76,0.1), transparent);
+    transition: left 0.5s;
+  }
+
+  .btn-generate:hover::before { left: 100%; }
+  .btn-generate:hover {
+    background: #3a2212;
+    letter-spacing: 0.5em;
+  }
+
+  .btn-generate:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    letter-spacing: 0.4em;
+  }
+
+  /* Output section */
+  .output-wrapper {
+    margin-top: 40px;
+    animation: fadeUp 0.6s ease both;
+  }
+
+  .output-header {
+    text-align: center;
+    margin-bottom: 32px;
+  }
+
+  .output-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 13px;
+    font-weight: 400;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    color: var(--warm-gray);
+  }
+
+  .output-card {
+    background: linear-gradient(135deg, #FDFAF5 0%, #F9F4EA 100%);
+    border: 1px solid rgba(201,168,76,0.2);
+    border-radius: 2px;
+    padding: 36px 40px;
+    margin-bottom: 16px;
+    position: relative;
+    transition: box-shadow 0.3s;
+  }
+
+  .output-card:hover {
+    box-shadow: 0 8px 32px rgba(44,26,14,0.08);
+  }
+
+  .output-card-label {
+    font-size: 9px;
+    font-weight: 500;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .output-card-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: rgba(201,168,76,0.2);
+  }
+
+  .output-text {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 19px;
+    font-weight: 300;
+    line-height: 1.75;
+    color: var(--deep-brown);
+    font-style: italic;
+  }
+
+  .output-text.short {
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 400;
+    letter-spacing: 0.02em;
+  }
+
+  .output-text.tip {
+    font-family: 'Raleway', sans-serif;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 300;
+    line-height: 1.7;
+    color: var(--warm-gray);
+  }
+
+  /* Tags row */
+  .tags-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 12px;
+  }
+
+  .tag {
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border: 1px solid rgba(201,168,76,0.4);
+    color: var(--gold);
+    border-radius: 1px;
+  }
+
+  /* Copy button */
+  .copy-btn {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    background: none;
+    border: 1px solid rgba(201,168,76,0.3);
+    color: var(--gold);
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    padding: 5px 10px;
+    cursor: pointer;
+    border-radius: 1px;
+    transition: all 0.2s;
+    font-family: 'Raleway', sans-serif;
+  }
+  .copy-btn:hover { background: var(--gold); color: white; }
+
+  /* Loading spinner */
+  .loading {
+    text-align: center;
+    padding: 40px;
+  }
+
+  .spinner {
+    width: 32px;
+    height: 32px;
+    border: 2px solid rgba(201,168,76,0.2);
+    border-top-color: var(--gold);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin: 0 auto 16px;
+  }
+
+  .loading-text {
+    font-size: 11px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--warm-gray);
+  }
+
+  /* Animations */
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  /* Footer */
+  .footer {
+    text-align: center;
+    margin-top: 50px;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    color: rgba(107,100,96,0.5);
+    text-transform: uppercase;
+    animation: fadeUp 1s 0.4s ease both;
+  }
+
+  @media (max-width: 600px) {
+    .card { padding: 30px 24px; }
+    .grid-2 { grid-template-columns: 1fr; }
+    .output-card { padding: 24px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="page-wrapper">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="header-ornament">
+      <div class="ornament-line"></div>
+      <div class="ornament-diamond"></div>
+      <div class="ornament-line right"></div>
+    </div>
+    <h1>Saffron <span>Script</span></h1>
+    <p class="tagline">The Luxury Menu Atelier</p>
+  </div>
+
+  <!-- Main Card -->
+  <div class="card">
+
+    <!-- Dish Name -->
+    <div class="field-group">
+      <span class="section-label">Dish</span>
+      <input type="text" id="dish" placeholder="e.g. Lamb Rogan Josh, Black Truffle Risotto…">
+    </div>
+
+    <!-- Cuisine + Course -->
+    <div class="grid-2">
+      <div class="field-group">
+        <span class="section-label">Cuisine</span>
+        <div class="select-wrapper">
+          <select id="cuisine">
+            <optgroup label="Asian">
+              <option>Indian</option>
+              <option>Japanese</option>
+              <option>Thai</option>
+              <option>Chinese</option>
+              <option>Korean</option>
+              <option>Vietnamese</option>
+            </optgroup>
+            <optgroup label="European">
+              <option>French</option>
+              <option>Italian</option>
+              <option>Mediterranean</option>
+              <option>Spanish</option>
+              <option>British</option>
+            </optgroup>
+            <optgroup label="Americas &amp; Global">
+              <option>Latin American</option>
+              <option>Middle Eastern</option>
+              <option>Moroccan</option>
+              <option>Fusion</option>
+              <option>Modern Global</option>
+            </optgroup>
+          </select>
+        </div>
+      </div>
+      <div class="field-group">
+        <span class="section-label">Course</span>
+        <div class="select-wrapper">
+          <select id="course">
+            <option>Amuse-Bouche</option>
+            <option>Appetiser</option>
+            <option>Soup</option>
+            <option selected>Main Course</option>
+            <option>Side Dish</option>
+            <option>Cheese Course</option>
+            <option>Pre-Dessert</option>
+            <option>Dessert</option>
+            <option>Petit Four</option>
+            <option>Cocktail Pairing</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Vibe + Tone -->
+    <div class="grid-2">
+      <div class="field-group">
+        <span class="section-label">Setting</span>
+        <div class="select-wrapper">
+          <select id="vibe">
+            <option>Michelin Fine Dining</option>
+            <option>Luxury Boutique Hotel</option>
+            <option>Elegant Bistro</option>
+            <option>Rustic Country Estate</option>
+            <option>Modern Brasserie</option>
+            <option>Rooftop Terrace</option>
+            <option>Private Members Club</option>
+            <option>Street-Style</option>
+            <option>Farm-to-Table</option>
+            <option>Beachside Resort</option>
+          </select>
+        </div>
+      </div>
+      <div class="field-group">
+        <span class="section-label">Language Tone</span>
+        <div class="select-wrapper">
+          <select id="tone">
+            <option>Poetic & Evocative</option>
+            <option>Classic & Refined</option>
+            <option>Playful & Warm</option>
+            <option>Minimal & Precise</option>
+            <option>Storytelling & Nostalgic</option>
+            <option>Sensory & Indulgent</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dietary badges -->
+    <div class="field-group">
+      <span class="section-label">Dietary Notes (optional)</span>
+      <div class="check-group">
+        <div class="check-pill"><input type="checkbox" id="vegan" value="Vegan"><label for="vegan">Vegan</label></div>
+        <div class="check-pill"><input type="checkbox" id="veg" value="Vegetarian"><label for="veg">Vegetarian</label></div>
+        <div class="check-pill"><input type="checkbox" id="gf" value="Gluten-Free"><label for="gf">Gluten-Free</label></div>
+        <div class="check-pill"><input type="checkbox" id="df" value="Dairy-Free"><label for="df">Dairy-Free</label></div>
+        <div class="check-pill"><input type="checkbox" id="raw" value="Raw"><label for="raw">Raw</label></div>
+        <div class="check-pill"><input type="checkbox" id="halal" value="Halal"><label for="halal">Halal</label></div>
+        <div class="check-pill"><input type="checkbox" id="kosher" value="Kosher"><label for="kosher">Kosher</label></div>
+        <div class="check-pill"><input type="checkbox" id="nut" value="Nut-Free"><label for="nut">Nut-Free</label></div>
+      </div>
+    </div>
+
+    <div class="divider">
+      <div class="divider-line"></div>
+      <div class="divider-text">Optional Detail</div>
+      <div class="divider-line"></div>
+    </div>
+
+    <!-- Simple description -->
+    <div class="field-group">
+      <span class="section-label">Your Notes</span>
+      <textarea id="simpleDesc" placeholder="Describe the dish simply, e.g. slow-braised lamb with warming spices and a pomegranate glaze…"></textarea>
+    </div>
+
+    <!-- Key ingredients -->
+    <div class="field-group">
+      <span class="section-label">Hero Ingredients (optional)</span>
+      <input type="text" id="ingredients" placeholder="e.g. Wagyu beef, truffle, aged parmesan, saffron…">
+    </div>
+
+    <!-- Output selections -->
+    <div class="field-group">
+      <span class="section-label">Generate</span>
+      <div class="check-group">
+        <div class="check-pill"><input type="checkbox" id="out-full" value="full" checked><label for="out-full">Full Description</label></div>
+        <div class="check-pill"><input type="checkbox" id="out-short" value="short" checked><label for="out-short">Short Menu Line</label></div>
+        <div class="check-pill"><input type="checkbox" id="out-social" value="social" checked><label for="out-social">Social Caption</label></div>
+        <div class="check-pill"><input type="checkbox" id="out-plate" value="plate" checked><label for="out-plate">Plating Tip</label></div>
+        <div class="check-pill"><input type="checkbox" id="out-pairing" value="pairing"><label for="out-pairing">Wine Pairing</label></div>
+        <div class="check-pill"><input type="checkbox" id="out-story" value="story"><label for="out-story">Origin Story</label></div>
+      </div>
+    </div>
+
+    <button class="btn-generate" id="generateBtn" onclick="generateDescription()">
+      Craft the Description
+    </button>
+  </div>
+
+  <!-- Output -->
+  <div id="outputWrapper" style="display:none"></div>
+
+  <div class="footer">Saffron Script &nbsp;·&nbsp; Luxury Menu Atelier &nbsp;·&nbsp; Every word, a flavour</div>
+</div>
+
+<script>
+  // ─── Core generators ───────────────────────────────────────────────────────
+
+  function getDietaryTags() {
+    const ids = ['vegan','veg','gf','df','raw','halal','kosher','nut'];
+    return ids.filter(id => document.getElementById(id).checked)
+              .map(id => document.getElementById(id).getAttribute('value'));
+  }
+
+  function getOutputSelections() {
+    const ids = ['out-full','out-short','out-social','out-plate','out-pairing','out-story'];
+    return ids.filter(id => document.getElementById(id).checked)
+              .map(id => document.getElementById(id).getAttribute('value'));
+  }
+
+  function buildPrompt(dish, cuisine, course, vibe, tone, dietary, ingredients, simpleDesc, outputs) {
+    const dietStr = dietary.length ? `Dietary: ${dietary.join(', ')}. ` : '';
+    const ingStr = ingredients ? `Key ingredients: ${ingredients}. ` : '';
+    const notesStr = simpleDesc ? `Chef's notes: "${simpleDesc}". ` : '';
+
+    const outputMap = {
+      full: `"full": a rich, evocative menu description (3–5 sentences, ${tone} tone)`,
+      short: `"short": a single elegant menu line (max 20 words)`,
+      social: `"social": an Instagram-worthy caption with 3 relevant hashtags (no more than 150 chars before hashtags)`,
+      plate: `"plating": a concise plating and presentation tip (2 sentences)`,
+      pairing: `"pairing": a sommelier-style wine or beverage pairing suggestion (2 sentences)`,
+      story: `"story": a brief poetic origin or cultural story snippet about the dish (2–3 sentences)`,
+    };
+
+    const requestedOutputs = outputs.map(o => outputMap[o]).filter(Boolean).join('; ');
+
+    return `You are a luxury menu copywriter for the world's finest restaurants. 
+Dish: "${dish}" | Cuisine: ${cuisine} | Course: ${course} | Setting: ${vibe} | Tone: ${tone}.
+${dietStr}${ingStr}${notesStr}
+Generate ONLY a valid JSON object (no markdown, no preamble) with these keys: ${requestedOutputs}.
+Write with exceptional craft — sensory language, elegant rhythm, and genuine gastronomic knowledge.`;
+  }
+
+  async function callClaude(prompt) {
+    const resp = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 1000,
+        messages: [{ role: "user", content: prompt }]
+      })
+    });
+    const data = await resp.json();
+    const raw = data.content.map(b => b.text || '').join('');
+    const clean = raw.replace(/```json|```/g, '').trim();
+    return JSON.parse(clean);
+  }
+
+  // ─── Fallback (no API) ─────────────────────────────────────────────────────
+
+  function fallback(dish, cuisine, course, vibe, tone, dietary, ingredients, simpleDesc, outputs) {
+    const ingNote = ingredients ? `, featuring ${ingredients.toLowerCase()}` : '';
+    const dietNote = dietary.length ? ` (${dietary.join(' · ')})` : '';
+    const vibeMap = {
+      'Michelin Fine Dining': ['A masterwork of contemporary fine dining', 'of extraordinary refinement and technical precision'],
+      'Luxury Boutique Hotel': ['An indulgent signature creation', 'of quiet luxury and considered elegance'],
+      'Elegant Bistro': ['A deeply satisfying bistro classic', 'with warmth, character, and refined simplicity'],
+      'Rustic Country Estate': ['A celebration of provenance and tradition', 'rich in heritage and comforting depth'],
+      'Modern Brasserie': ['A boldly reimagined brasserie favourite', 'of vibrant flavour and contemporary confidence'],
+      'Rooftop Terrace': ['A luminous, sun-kissed creation', 'light, celebratory, and effortlessly chic'],
+      'Private Members Club': ['An exclusive house signature', 'steeped in tradition and quiet distinction'],
+      'Street-Style': ['An electrifying street-food icon', 'bold, honest, and wonderfully alive'],
+      'Farm-to-Table': ['A seasonal ode to the land', 'grounded in provenance and natural integrity'],
+      'Beachside Resort': ['A holiday of a dish', 'breezy, vibrant, and gloriously sun-drenched'],
+    };
+    const [prefix, suffix] = vibeMap[vibe] || ['A distinguished creation', 'of elegant proportion'];
+
+    const result = {};
+    if (outputs.includes('full'))
+      result.full = `${prefix}${dietNote}, our ${dish} draws on the finest traditions of ${cuisine.toLowerCase()} cuisine${ingNote}. Presented as ${course.toLowerCase()}, it delivers ${suffix} — an experience as memorable for the eye as for the palate.`;
+    if (outputs.includes('short'))
+      result.short = `${dish}${dietNote} — ${cuisine} ${course.toLowerCase()}${ingNote}.`;
+    if (outputs.includes('social'))
+      result.social = `Every plate tells a story. Our ${dish} is ${suffix.replace('of ', '')} — a moment of pure culinary poetry. ✨ #${cuisine.replace(/\s/g,'')}Cuisine #LuxuryDining #MenuArt`;
+    if (outputs.includes('plate'))
+      result.plating = `Present on a wide-rimmed plate with deliberate negative space. Finish with a precise drizzle, micro herbs, or an edible bloom that echoes the dish's principal flavour.`;
+    if (outputs.includes('pairing'))
+      result.pairing = `A full-bodied ${cuisine.includes('French') || cuisine.includes('Italian') ? 'Burgundy or aged Barolo' : 'Viognier or off-dry Riesling'} complements the dish beautifully. For a non-alcoholic alternative, consider a white tea or tamarind-citrus shrub.`;
+    if (outputs.includes('story'))
+      result.story = `Born from centuries of culinary tradition, ${dish} embodies the spirit of ${cuisine.toLowerCase()} gastronomy — a living recipe shaped by generations of cooks who understood that the truest luxury lies in honest, deeply considered flavour.`;
+    return result;
+  }
+
+  // ─── Render ────────────────────────────────────────────────────────────────
+
+  const labelMap = {
+    full: 'Signature Description',
+    short: 'Menu Line',
+    social: 'Social Caption',
+    plating: 'Plating & Presentation',
+    pairing: "Sommelier's Pairing",
+    story: 'Origin & Story',
+  };
+
+  function renderOutput(data, dish, cuisine, dietary) {
+    const wrapper = document.getElementById('outputWrapper');
+    const tags = [cuisine, ...dietary];
+
+    let html = `<div class="output-wrapper"><div class="output-header"><p class="output-title">✦ &nbsp; Your Curated Descriptions &nbsp; ✦</p></div>`;
+
+    for (const [key, text] of Object.entries(data)) {
+      if (!text) continue;
+      const isLong = key === 'full' || key === 'story';
+      const isTip = key === 'plating' || key === 'pairing';
+      const cls = isTip ? 'tip' : isLong ? '' : 'short';
+      html += `
+        <div class="output-card">
+          <button class="copy-btn" data-copy="${text.replace(/"/g,'&quot;').replace(/'/g,'&#39;')}" onclick="copyText(this)">Copy</button>
+          <div class="output-card-label">${labelMap[key] || key}</div>
+          <div class="output-text ${cls}">${text}</div>
+          ${key === 'full' ? `<div class="tags-row">${tags.map(t=>`<span class="tag">${t}</span>`).join('')}</div>` : ''}
+        </div>`;
+    }
+    html += `</div>`;
+    wrapper.innerHTML = html;
+    wrapper.style.display = 'block';
+    wrapper.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function renderLoading() {
+    const wrapper = document.getElementById('outputWrapper');
+    wrapper.innerHTML = `<div class="output-wrapper"><div class="output-card loading"><div class="spinner"></div><p class="loading-text">Composing your descriptions…</p></div></div>`;
+    wrapper.style.display = 'block';
+  }
+
+  // ─── Main ──────────────────────────────────────────────────────────────────
+
+  window.generateDescription = async function generateDescription() {
+    const dish = document.getElementById('dish').value.trim();
+    if (!dish) { document.getElementById('dish').focus(); return; }
+
+    const cuisine = document.getElementById('cuisine').value;
+    const course = document.getElementById('course').value;
+    const vibe = document.getElementById('vibe').value;
+    const tone = document.getElementById('tone').value;
+    const simpleDesc = document.getElementById('simpleDesc').value.trim();
+    const ingredients = document.getElementById('ingredients').value.trim();
+    const dietary = getDietaryTags();
+    const outputs = getOutputSelections();
+
+    if (!outputs.length) { alert('Please select at least one output type.'); return; }
+
+    const btn = document.getElementById('generateBtn');
+    btn.disabled = true;
+    btn.textContent = 'Crafting…';
+    renderLoading();
+
+    try {
+      const prompt = buildPrompt(dish, cuisine, course, vibe, tone, dietary, ingredients, simpleDesc, outputs);
+      const result = await callClaude(prompt);
+      renderOutput(result, dish, cuisine, dietary);
+    } catch (e) {
+      // Graceful fallback
+      const result = fallback(dish, cuisine, course, vibe, tone, dietary, ingredients, simpleDesc, outputs);
+      renderOutput(result, dish, cuisine, dietary);
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Craft the Description';
+    }
+  }
+
+  window.copyText = function copyText(btn) {
+    const text = btn.getAttribute('data-copy');
+    navigator.clipboard.writeText(text).then(() => {
+      btn.textContent = 'Copied ✓';
+      btn.style.background = 'var(--gold)';
+      btn.style.color = 'white';
+      setTimeout(() => { btn.textContent = 'Copy'; btn.style.background = ''; btn.style.color = ''; }, 2000);
+    });
+  }
+</script>
+</body>
+</html>
